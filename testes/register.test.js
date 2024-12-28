@@ -12,7 +12,7 @@ describe('POST /auth/register', () => {
     await pool.end();
   });
 
-  it('should register a new user successfully', async () => {
+  it('Deverá resgistrar usuário novo com sucesso', async () => {
     const newUser = {
       nome: 'Novo Usuário',
       email: 'novo@example.com',
@@ -26,7 +26,7 @@ describe('POST /auth/register', () => {
     expect(res.body.message).toBe('Usuário registrado com sucesso!');
   });
 
-  it('should return error if required fields are missing', async () => {
+  it('Deverá retornar um erro informando que todos os campos são obrigatórios', async () => {
     const incompleteUser = {
       nome: 'Usuário Incompleto',
       email: '', 
@@ -40,7 +40,7 @@ describe('POST /auth/register', () => {
     expect(res.body.message).toBe('Todos os campos são obrigatórios.');
   });
 
-  it('should return error if email is already in use', async () => {
+  it('Deverá retornar um erro que existe esse e-mail já está registrado', async () => {
     const duplicateUser = {
       nome: 'Novo Usuário',
       email: 'novo@example.com', 
