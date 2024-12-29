@@ -1,9 +1,7 @@
 const bcrypt = require('bcryptjs');
 const pool = require('../config/database');
-const jwt = require('jsonwebtoken');
 
 const registrarUsuario = async (req, res) => {
-
     const { nome, email, senha, nivel } = req.body;
 
     if (!nome || !email || !senha || !nivel) {
@@ -29,4 +27,95 @@ const registrarUsuario = async (req, res) => {
     }
 };
 
-module.exports = { registrarUsuario };
+const deletarUsuario = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deleteQuery = 'DELETE FROM usuarios WHERE id = ?';
+        const [result] = await pool.promise().query(deleteQuery, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        res.status(200).json({ message: 'Usuário deletado com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao deletar o usuário.' });
+    }
+};
+
+const atualizarUsuario = async (req, res) => {
+    const { id } = req.params;
+    const { nome, email, senha, nivel } = req.body;
+
+    if (!nome || !email || !nivel) {
+        return res.status(400).json({ message: 'Nome, e-mail e nível são obrigatórios.' });
+    }
+
+    try {
+        const query = 'SELECT * FROM usuarios WHERE id = ?';
+        const [rows] = await pool.promise().query(query, [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        let updateQuery = 'UPDATE usuarios SET nome = ?, email = ?, nivel = ?';
+        const queryParams = [nome, email, nivel];
+
+        if (senha) {
+            const hashedPassword = await bcrypt.hash(senha, 10);
+            updateQuery += ', senha = ?';
+            queryParams.push(hashedPassword);
+        }
+
+        updateQuery += ' WHERE id = ?';
+        queryParams.push(id);
+
+        await pool.promise().query(updateQuery, queryParams);
+
+        res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao atualizar o usuário.' });
+    }
+};
+
+const buscarTodosUsuarios = async (req, res) => {
+    try {
+        const query = 'SELECT id, nome, email, nivel FROM usuarios';
+        const [rows] = await pool.promise().query(query);
+
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao buscar os usuários.' });
+    }
+};
+
+const buscarUsuarioPorId = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const query = 'SELECT id, nome, email, nivel FROM usuarios WHERE id = ?';
+        const [rows] = await pool.promise().query(query, [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        res.status(200).json(rows[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao buscar o usuário.' });
+    }
+};
+
+module.exports = {
+    registrarUsuario,
+    deletarUsuario,
+    atualizarUsuario,
+    buscarTodosUsuarios,
+    buscarUsuarioPorId,
+};
