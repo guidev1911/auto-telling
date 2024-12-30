@@ -12,6 +12,7 @@ const { login } = require('../controllers/loginController');
 
 const router = express.Router();
 
+// router.post('/register', registrarUsuario);
 router.post('/register', authenticateToken, authorizeRole(['admin']), registrarUsuario); 
 router.delete('/user/:id', authenticateToken, authorizeRole(['admin']), deletarUsuario);
 router.put('/user/:id', authenticateToken, authorizeRole(['admin']), atualizarUsuario);
