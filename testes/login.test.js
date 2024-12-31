@@ -5,7 +5,6 @@ const app = require('../app');
 
 describe('POST /auth/login', () => {
     beforeAll(async () => {
-        // Limpa a tabela e insere um usuário de teste antes de todos os testes
         await pool.execute('DELETE FROM usuarios');
 
         const senhaHash = await bcrypt.hash('senha123', 10);
@@ -19,7 +18,6 @@ describe('POST /auth/login', () => {
     });
 
     afterAll(async () => {
-        // Fecha a conexão do banco após os testes
         await pool.end();
     });
 
