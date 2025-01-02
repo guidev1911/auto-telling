@@ -27,7 +27,7 @@ describe('POST /auth/register', () => {
     await pool.end();
   });
 
-  it('Deverá registrar um novo usuário com sucesso', async () => {
+  it('Deve registrar um novo usuário com sucesso', async () => {
     const newUser = {
       nome: 'Usuário Teste',
       email: 'teste@gmail.com',
@@ -50,7 +50,7 @@ describe('POST /auth/register', () => {
     expect(await bcrypt.compare(newUser.senha, rows[0].senha)).toBe(true);
   });  
 
-  it('Deverá retornar um erro informando que todos os campos são obrigatórios', async () => {
+  it('Deve retornar um erro informando que todos os campos são obrigatórios', async () => {
     const incompleteUser = {
       nome: 'Usuário Incompleto',
       email: '', 
@@ -67,7 +67,7 @@ describe('POST /auth/register', () => {
     expect(res.body.message).toBe('Todos os campos são obrigatórios.');
   });
 
-  it('Deverá retornar um erro caso o e-mail já esteja registrado', async () => {
+  it('Deve retornar um erro caso o e-mail já esteja registrado', async () => {
     const duplicateUser = {
       nome: 'Admin User',
       email: 'admin@gmail.com', 
@@ -84,7 +84,7 @@ describe('POST /auth/register', () => {
     expect(res.body.message).toBe('O e-mail já está em uso.');
   });
 
-  it('Deverá retornar um erro caso o usuário não tenha nível de acesso adequado', async () => {
+  it('Deve retornar um erro caso o usuário não tenha nível de acesso adequado', async () => {
 
     const hashedPassword = await bcrypt.hash('senha1234', 10);
     await pool.execute(

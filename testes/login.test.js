@@ -21,7 +21,7 @@ describe('POST /auth/login', () => {
         await pool.end();
     });
 
-    it('Deverá retornar um token para credenciais válidas', async () => {
+    it('Deve retornar um token para credenciais válidas', async () => {
         const loginData = {
             email: 'teste@example.com',
             senha: 'senha123',
@@ -33,7 +33,7 @@ describe('POST /auth/login', () => {
         expect(res.body).toHaveProperty('token');
     });
 
-    it('Deverá retornar erro 401 para email inválido', async () => {
+    it('Deve retornar erro 401 para email inválido', async () => {
         const loginData = {
             email: 'invalido@example.com',
             senha: 'senha123',
@@ -45,7 +45,7 @@ describe('POST /auth/login', () => {
         expect(res.body.message).toBe('Credenciais inválidas!');
     });
 
-    it('Deverá retornar erro 401 para senha inválida', async () => {
+    it('Deve retornar erro 401 para senha inválida', async () => {
         const loginData = {
             email: 'teste@example.com',
             senha: 'senhaErrada',
