@@ -49,16 +49,22 @@ const atualizarUsuario = async (req, res) => {
     const { id } = req.params;
     const { nome, email, senha, nivel } = req.body;
 
-    if (!nome || !email || !nivel) {
-        return res.status(400).json({ message: 'Nome, e-mail e nível são obrigatórios.' });
+    if (!nome || !email || !senha || !nivel) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
     }
 
     try {
         const query = 'SELECT * FROM usuarios WHERE id = ?';
         const [rows] = await pool.promise().query(query, [id]);
 
+        const query2 = 'SELECT * FROM usuarios WHERE id != ? AND email = ?';
+        const [rows2] = await pool.promise().query(query2, [id, email]);        
+
         if (rows.length === 0) {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+        if (rows2.length > 0) {
+            return res.status(409).json({ message: 'O e-mail já está em uso.' });
         }
 
         let updateQuery = 'UPDATE usuarios SET nome = ?, email = ?, nivel = ?';
