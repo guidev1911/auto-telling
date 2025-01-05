@@ -282,6 +282,42 @@ router.delete('/user/:id', authenticateToken, authorizeRole(['admin']), deletarU
  */
 router.put('/user/:id', authenticateToken, authorizeRole(['admin']), atualizarUsuario);
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Realiza login na aplicação
+ *     tags:
+ *       - Autenticação
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: O e-mail do usuário
+ *               senha:
+ *                 type: string
+ *                 format: password
+ *                 description: A senha do usuário
+ *     responses:
+ *       200:
+ *         description: Login bem-sucedido. Retorna o token JWT.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: O token JWT para autenticação
+ *       401:
+ *         description: Credenciais inválidas
+ */
 router.post('/login', login);
 
 module.exports = router;
