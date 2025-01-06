@@ -1,7 +1,11 @@
 const bcrypt = require('bcryptjs');
 const pool = require('../config/database');
+const userSchema = require('../validators/userValidator');
 
 const registrarUsuario = async (req, res) => {
+    const { error } = userSchema.validate(req.body);
+    if (error) return res.status(400).send({ error: error.details[0].message });
+
     const { nome, email, senha, nivel } = req.body;
 
     if (!nome || !email || !senha || !nivel) {
@@ -46,6 +50,9 @@ const deletarUsuario = async (req, res) => {
 };
 
 const atualizarUsuario = async (req, res) => {
+    const { error } = userSchema.validate(req.body);
+    if (error) return res.status(400).send({ error: error.details[0].message });
+
     const { id } = req.params;
     const { nome, email, senha, nivel } = req.body;
 
