@@ -19,12 +19,14 @@ const registrarUsuario = async (req, res) => {
         if (rows.length > 0) {
             return res.status(409).json({ message: 'O e-mail já está em uso.' });
         }
+
         const hashedPassword = await bcrypt.hash(senha, 10);
 
         const insertQuery = 'INSERT INTO usuarios (nome, email, senha, nivel) VALUES (?, ?, ?, ?)';
-        await pool.promise().query(insertQuery, [nome, email, hashedPassword, nivel]);
+        const [result] = await pool.promise().query(insertQuery, [nome, email, hashedPassword, nivel]);
 
-        res.status(201).json({ message: 'Usuário registrado com sucesso!' });
+        // Retorna o ID do usuário inserido junto com os dados enviados
+        res.status(201).json({ message: 'Usuário registrado com sucesso!', id: result.insertId });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Erro ao registrar o usuário.' });

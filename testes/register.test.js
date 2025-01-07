@@ -3,8 +3,10 @@ const bcrypt = require('bcryptjs');
 const pool = require('../src/config/database');
 const app = require('../app');
 
+let userId;
+let adminToken;
+
 describe('POST /auth/register', () => {
-  let adminToken;
 
   beforeAll(async () => {
     await pool.execute('DELETE FROM usuarios');
@@ -42,6 +44,7 @@ describe('POST /auth/register', () => {
   
     expect(res.status).toBe(201);
     expect(res.body.message).toBe('Usuário registrado com sucesso!');
+    userId = res.body.id;
   
     const [rows] = await pool.promise().execute('SELECT * FROM usuarios WHERE email = ?', [newUser.email]);
   
@@ -49,6 +52,49 @@ describe('POST /auth/register', () => {
     expect(rows[0].nome).toBe(newUser.nome);
     expect(await bcrypt.compare(newUser.senha, rows[0].senha)).toBe(true);
   });  
+
+  it('Deve atualizar um usuário com sucesso', async () => {
+    const updatedUser = {
+      nome: 'Usuário atualizado',
+      email: 'teste@gmail.com',
+      senha: '123456',
+      nivel: 'vendedor',
+    };
+
+    const res = await request(app)
+      .put(`/auth/user/${userId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send(updatedUser);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Usuário atualizado com sucesso!');
+  });
+
+  it('Deve exibir erro ao tentar atualizar um usuário com e-mail ja registrado', async () => {
+    const updateUser = {
+      nome: 'Usuário atualizado',
+      email: 'admin@gmail.com',
+      senha: '123456',
+      nivel: 'vendedor',
+    };
+
+    const res = await request(app)
+      .put(`/auth/user/${userId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send(updateUser);
+
+    expect(res.status).toBe(409);
+    expect(res.body.message).toBe('O e-mail já está em uso.');
+  });
+
+  it('Deve listar todos os usuários', async () => {
+    const res = await request(app)
+      .get('/auth/user')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBeGreaterThan(0);
+  });
 
   it('Deve retornar um erro informando que todos os campos são obrigatórios', async () => {
     const incompleteUser = {
@@ -110,5 +156,22 @@ describe('POST /auth/register', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.message).toBe('Acesso negado!');
+  });
+
+  it('Deve excluir um usuário com sucesso', async () => {
+    const res = await request(app)
+      .delete(`/auth/user/${userId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Usuário deletado com sucesso!');
+  });
+
+  it('Deve retornar erro ao buscar um usuário excluído', async () => {
+    const res = await request(app)
+      .get(`/auth/user/${userId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(404);
   });
 });
