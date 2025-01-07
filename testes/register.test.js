@@ -53,7 +53,6 @@ describe('POST /auth/register', () => {
   it('Deve retornar um erro informando que todos os campos são obrigatórios', async () => {
     const incompleteUser = {
       nome: 'Usuário Incompleto',
-      email: '', 
       senha: '123456',
       nivel: 'vendedor',
     };
