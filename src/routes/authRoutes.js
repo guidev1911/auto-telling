@@ -117,9 +117,6 @@ router.get('/user/:id', authenticateToken, authorizeRole(['admin']), buscarUsuar
  *           schema:
  *             type: object
  *             properties:
- *                 id:
- *                   type: integer
- *                   description: ID do usuário
  *                 nome:
  *                   type: string
  *                   description: Nome do usuário
