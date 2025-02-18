@@ -40,6 +40,8 @@ const createCarro = (req, res) => {
         consumo_medio, status, caracteristicas
     ], (err, result) => {
         if (err) return res.status(500).send({ error: 'Erro ao adicionar carro!' });
+        const io = req.app.get("io");
+        io.emit("carrosUpdated");
         res.status(201).send({ id: result.insertId, ...req.body });
     });
 };
@@ -67,6 +69,8 @@ const updateCarro = (req, res) => {
     ], (err, result) => {
         if (err) return res.status(500).send({ error: 'Erro ao atualizar carro!' });
         if (result.affectedRows === 0) return res.status(404).send({ error: 'Carro não encontrado!' });
+        const io = req.app.get("io");
+        io.emit("carrosUpdated");
         res.send({ id, ...req.body });
     });
 };
@@ -78,6 +82,8 @@ const deleteCarro = (req, res) => {
     connection.query(sql, [id], (err, result) => {
         if (err) return res.status(500).send({ error: 'Erro ao deletar carro!' });
         if (result.affectedRows === 0) return res.status(404).send({ error: 'Carro não encontrado!' });
+        const io = req.app.get("io");
+        io.emit("carrosUpdated");
         res.status(204).send();
     });
 };
