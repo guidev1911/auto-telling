@@ -58,8 +58,8 @@ const atualizarUsuario = async (req, res) => {
     const { id } = req.params;
     const { nome, email, senha, nivel } = req.body;
 
-    if (!nome || !email || !senha || !nivel) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+    if (!nome || !email || !nivel) {
+        return res.status(400).json({ message: 'Nome, email e nível são obrigatórios.' });
     }
 
     try {
