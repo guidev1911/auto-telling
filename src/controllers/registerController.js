@@ -25,7 +25,8 @@ const registrarUsuario = async (req, res) => {
         const insertQuery = 'INSERT INTO usuarios (nome, email, senha, nivel) VALUES (?, ?, ?, ?)';
         const [result] = await pool.promise().query(insertQuery, [nome, email, hashedPassword, nivel]);
 
-        // Retorna o ID do usuário inserido junto com os dados enviados
+        const io = req.app.get("io");
+        io.emit("usersUpdated");
         res.status(201).json({ message: 'Usuário registrado com sucesso!', id: result.insertId });
     } catch (error) {
         console.error(error);
@@ -44,6 +45,8 @@ const deletarUsuario = async (req, res) => {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
 
+        const io = req.app.get("io");
+        io.emit("usersUpdated");
         res.status(200).json({ message: 'Usuário deletado com sucesso!' });
     } catch (error) {
         console.error(error);
@@ -90,6 +93,8 @@ const atualizarUsuario = async (req, res) => {
 
         await pool.promise().query(updateQuery, queryParams);
 
+        const io = req.app.get("io");
+        io.emit("usersUpdated");
         res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
     } catch (error) {
         console.error(error);
