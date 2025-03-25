@@ -50,7 +50,7 @@ const router = express.Router();
  *       403:
  *         description: Token inválido ou acesso negado
  */
-router.get('/user', authenticateToken, authorizeRole(['admin']), buscarTodosUsuarios);
+router.get('/user', authenticateToken, buscarTodosUsuarios);
 
 /**
  * @swagger
